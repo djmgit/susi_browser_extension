@@ -7,6 +7,72 @@ $(document).ready(function(){
   var url = "https://api.asksusi.com/susi/chat.json?q=";
   var body = document.getElementById('window');
 
+  /* process user message and take a decission */
+  var processMessage = function(message) {
+    var token_array = message.split(" ");
+    console.log(token_array);
+    if (token_array.indexOf("open") !== -1 || token_array.indexOf("OPEN") !== -1) {
+      openPage(token_array[token_array.length - 1]);
+    } else if (token_array[0].toLowerCase() === "search") {
+      webSearch(token_array, message);
+    } else {
+      send_message(message);
+    }
+  }
+
+  /* search web */
+
+  var webSearch = function(token_array, message) {
+    var google = false;
+    var duckduckgo = false;
+    var bing = false;
+    var num = 0;
+    var search_term = "";
+    if (token_array.indexOf("google") !== -1 || token_array.indexOf("GOOGLE") !== -1) {
+      google = true;
+      num += 1;
+    }
+    if (token_array.indexOf("bing") !== -1 || token_array.indexOf("BING") !== -1) {
+      bing = true;
+      num += 1;
+    }
+    if (token_array.indexOf("duckduckgo") !== -1 || token_array.indexOf("DUCKDUCKGO") !== -1) {
+      duckduckgo = true;
+      num += 1;
+    }
+    if (google === false && duckduckgo === false && bing === false) {
+      append("Sorry! I dont know about this search engine. Please use google, bing or duckduckgo", { name: "class", val: "from-them" });
+      return;
+    }
+    search_term = token_array.slice(num + 1).join('+');
+    if (google === true) {
+      var search_url = "https://www.google.co.in/search?site=&source=hp&q=" + search_term + "&oq=" + search_term + "&gs_l=hp.3..0l10.15130.23099.0.23503.30.24.2.3.3.0.379.3486.0j10j6j1.17.0....0...1c.1.64.hp..10.19.3036.0..35i39k1j0i131k1j0i10k1.46gxKrandYc";
+      var search_tab = chrome.tabs.create({url: search_url});
+    }
+    if (bing === true) {
+      var search_url = "http://www.bing.com/search?q=" + search_term + "&qs=n&form=QBLH&sp=-1&pq=" + search_term + "&sc=8-14&sk=&cvid=56D81D26436548CF9AA1B6296219240E";
+      var search_tab = chrome.tabs.create({url: search_url});
+    }
+    if (duckduckgo === true) {
+      var search_url = "https://beta.duckduckgo.com/?q=" + search_term + "&t=ha";
+      var search_tab = chrome.tabs.create({url: search_url});
+    }
+
+    append("done!", { name: "class", val: "from-them" });
+  }
+
+  /* function to open a page specified by user */
+  var openPage = function(pagename) {
+    if (pagename.indexOf("http") === -1) {
+      pagename = "http://" + pagename;
+    }
+    if (pagename.indexOf(".") === -1) {
+      pagename += ".com";
+    }
+    chrome.tabs.create({url: pagename});
+    append("done!", { name: "class", val: "from-them" });
+  }
+
   var send_message = function(message) {
     $.ajax({
       url: url + encodeURI(message),
@@ -72,9 +138,10 @@ $(document).ready(function(){
       let message = text.value;
       if (message.length !== 0) {
         text.value = "";
-        send_message(message);
         append(message, { name: "class", val: "from-me" });
-        //addReply();
+        processMessage(message);
+        //send_message(message);
+        //append(message, { name: "class", val: "from-me" });
       }
     }
   }
