@@ -159,6 +159,24 @@ function doSpeak(s) {
   return false;  
 }*/
 
+function searchBingAction(info, tab) {
+  var search_term = info.selectionText.replace(/ /g, '+');
+  var search_url = "http://www.bing.com/search?q=" + search_term + "&qs=n&form=QBLH&sp=-1&pq=" + search_term + "&sc=8-14&sk=&cvid=56D81D26436548CF9AA1B6296219240E";
+  var searchTab = chrome.tabs.create({url: search_url});
+}
+
+function searchDuckDuckGoAction(info, tab) {
+  var search_term = info.selectionText.replace(/ /g, '+');
+  var search_url = "https://beta.duckduckgo.com/?q=" + search_term + "&t=ha";
+  var searchTab = chrome.tabs.create({url: search_url});
+}
+
 /* creating context menu item to read text */
 
-var readTextMenuItem = chrome.contextMenus.create({"title": "Read this Susi", "contexts":["selection"], "onclick":readText});
+var susiContextMenu = chrome.contextMenus.create({"title": "Susi", "contexts": ["selection"]});
+
+var readTextMenuItem = chrome.contextMenus.create({"title": "Read this Susi", "parentId": susiContextMenu, "contexts": ["selection"], "onclick":readText});
+var searchOption = chrome.contextMenus.create({"title": "Search this Susi", "parentId": susiContextMenu, "contexts": ["selection"]});
+var searchBing = chrome.contextMenus.create({"title": "Bing", "parentId": searchOption, "contexts": ["selection"], "onclick": searchBingAction});
+var searchDuckDuckGo = chrome.contextMenus.create({"title": "DuckDuckGo", "parentId": searchOption, "contexts": ["selection"], "onclick": searchDuckDuckGoAction});
+
