@@ -7,6 +7,21 @@ $(document).ready(function(){
   var url = "https://api.asksusi.com/susi/chat.json?q=";
   var body = document.getElementById('window');
 
+  /* notes object: used to take notes from users */
+
+  var notes = {
+    'currentnotes': [],
+    'length': 0
+  };
+
+  /* function to retrieve the present notes if any */
+
+  chrome.storage.local.get('notes', function (localnotes) {
+    if (Object.keys(localnotes).length !== 0) {
+      notes = localnotes.notes;
+    }
+  }); 
+
   /* process user message and take a decission */
   var processMessage = function(message) {
     var token_array = message.split(" ");
@@ -15,7 +30,14 @@ $(document).ready(function(){
       openPage(token_array[token_array.length - 1]);
     } else if (token_array[0].toLowerCase() === "search") {
       webSearch(token_array, message);
-    } else {
+    } else if (message.indexOf("take note") !== -1 || message.indexOf("TAKE NOTE") !== -1) {
+      takeNote(token_array, message);
+    } else if (message.indexOf("show note") !== -1 || message.indexOf("SHOW NOTE") !== -1) {
+      showNotes()
+    } else if (message.indexOf("clear note") !== -1 || message.indexOf("CLEAR NOTE") !== -1) {
+      clearNotes();	
+    }
+    else {
       send_message(message);
     }
   }
@@ -41,7 +63,7 @@ $(document).ready(function(){
       num += 1;
     }
     if (google === false && duckduckgo === false && bing === false) {
-      append("Sorry! I dont know about this search engine. Please use google, bing or duckduckgo", { name: "class", val: "from-them" });
+      append("Sorry! I dont know about this search engine. Please use google, bing or duckduckgo", { name: "class", val: "from-them" }, "text");
       return;
     }
     search_term = token_array.slice(num + 1).join('+');
@@ -58,7 +80,7 @@ $(document).ready(function(){
       var search_tab = chrome.tabs.create({url: search_url});
     }
 
-    append("done!", { name: "class", val: "from-them" });
+    append("done!", { name: "class", val: "from-them" }, "text");
   }
 
   /* function to open a page specified by user */
@@ -70,7 +92,42 @@ $(document).ready(function(){
       pagename += ".com";
     }
     chrome.tabs.create({url: pagename});
-    append("done!", { name: "class", val: "from-them" });
+    append("done!", { name: "class", val: "from-them" }, "text");
+  }
+
+  /* function to save a note */
+
+  var takeNote = function(token_array, message) {
+    var note_title = token_array[2];
+    var note_body = token_array.slice(3).join(' ');
+    var note = {'title': note_title, 'body': note_body};
+    notes.currentnotes.unshift(note);
+    notes.length += 1;
+    chrome.storage.local.set({'notes': notes}, function() {
+      append("Note taken", { name: "class", val: "from-them" }, "text");
+    });
+  }
+
+  var showNotes = function() {
+    if (notes.length === 0) {
+      append("You do not have any notes to show yet", { name: "class", val: "from-them" }, "text");
+    } else {
+      var formatted_notes = getFormattedNotes();
+      append(getFormattedNotes(), { name: "class", val: "from-them" }, "html");
+    }
+  }
+
+  var getFormattedNotes = function() {
+    var formatted_notes = "";
+	notes.currentnotes.forEach(function(note) {
+      /*formatted_notes += '<div class="note">' + 
+      						'<div class="note-title">' + note.title + '</div>' +
+      						'<div class="note-body">' + note.body + '</div>' +
+      					 '</div>'	*/
+      	formatted_notes += '<strong>' + note.title + ':' + '</strong>' + '</br>' + note.body + '</br>';
+
+    });
+    return formatted_notes;
   }
 
   var send_message = function(message) {
@@ -93,15 +150,27 @@ $(document).ready(function(){
         reply = "Sorry. There seems to be a problem."
         addReply();
       }
-
-    });
-       
+	});
   }
 
-  var append = function(text, attr){
+  var clearNotes = function() {
+ 	notes = {
+      'currentnotes': [],
+      'length': 0
+  	};
+ 	chrome.storage.local.set({}, function() {
+      append("Cleared all notes", { name: "class", val: "from-them" }, "text");
+    });
+  }
+
+  var append = function(text, attr, type){
     let el = document.createElement("div");
     el.setAttribute(attr.name, attr.val);
-    el.appendChild(document.createTextNode(text));
+    if (type === "text") {
+      el.appendChild(document.createTextNode(text));
+    } else if (type === "html") {
+    	el.innerHTML = text;
+    }
     list.appendChild(el);
     if (attr.val === "from-them") {
       addTime({ name: "class", val: "susi-time", text: "susi" });
@@ -117,7 +186,7 @@ $(document).ready(function(){
 
   var addReply = function() {
     if(reply != undefined) {
-      append(reply, { name: "class", val: "from-them" });
+      append(reply, { name: "class", val: "from-them" }, "text");
       reply = undefined;
     }
   }
@@ -138,7 +207,7 @@ $(document).ready(function(){
       let message = text.value;
       if (message.length !== 0) {
         text.value = "";
-        append(message, { name: "class", val: "from-me" });
+        append(message, { name: "class", val: "from-me" }, "text");
         processMessage(message);
         //send_message(message);
         //append(message, { name: "class", val: "from-me" });

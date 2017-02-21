@@ -15,7 +15,8 @@
   "permissions": [
     "activeTab",
     "https://ajax.googleapis.com/",
-    "contextMenus"
+    "contextMenus",
+    "storage"
   ],
 
   "background": {
