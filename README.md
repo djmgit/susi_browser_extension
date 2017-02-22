@@ -44,12 +44,20 @@ if user types`clear note(s)`.
 
 Presently only development version is available.In order to install and try out this extension please follow the below steps:
 
+In order to load unpacked version (useful when making and testing changes during development) :
+
 1. Clone this repository using `git clone https://github.com/djmgit/susi_browser_extension.git`
 2. To install on Chrome: Open Chrome, Enter chrome://extensions in the url field, check developer mode, click
-   on load unpacked extension and navigate to the extension folder which you just cloned and open it.The extension will
-   be installed.
-3. To install on Firefox: Open Firefox, open about:debugging, click on load temporary addon, navigate to the extension folder
-   and select and open any file in that folder. The extension will be installed.
+   on load unpacked extension and navigate to the extension folder which you just cloned.Navigate to the directory which
+   contains manifest.json (susi_browser_extension/susi_browser_extension/) and click open. The extension will be installed on    chrome. Cheers !!.
+3. To install on Firefox: Open Firefox, open about:debugging, click on load temporary addon, navigate to the extension folder, open the directory which contains manifest.json file (susi_browser_extension/susi_browser_extension/) and select and open any file in that folder. The extension will be installed in firefox. Cheers !!.
+
+In order to install packaged version :
+
+Presently packaged version is present only for Chrome which can be installed as follows :
+
+Open Chrome, navigate to chrome://extensions, open susi_browser_extension/dist and drag and drop susi_browser_extension.crx into
+the chrome://extensions page. The extension will be installed. Cheers !!.
 
 # Contributing
 
