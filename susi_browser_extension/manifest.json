@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
 
-  "name": "Browser extension for api.asksusi.com",
+  "name": "Susi",
   "description": "This extension shows a Google Image search result for the current page",
   "version": "1.0",
   
