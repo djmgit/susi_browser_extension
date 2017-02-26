@@ -142,7 +142,7 @@ $(document).ready(function(){
         var response = JSON.stringify(response);
         data = JSON.parse(response);
         reply = undefined;
-        reply = data.answers[0].data[0].answer;
+        reply = data.answers[0].actions[0].expression;
         addReply();
       }, 
       error: function(xhr){

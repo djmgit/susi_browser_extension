@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Susi",
-  "description": "This extension shows a Google Image search result for the current page",
+  "description": "A browser assistance tool developed using api.asksusi.com",
   "version": "1.0",
   
   "web_accessible_resources": ["lib/jquery.min.js","main.js"],
